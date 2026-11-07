@@ -3,6 +3,7 @@ import { serve } from "@hono/node-server";
 
 import { env } from "./config/env.js";
 import { neo4jDriver } from "./config/neo4j.js";
+import graphRoutes from "./routes/graph.routes.js";
 
 const app = new Hono();
 
@@ -31,6 +32,8 @@ app.get("/health", async (c) => {
     }, 503);
   }
 });
+
+app.route("/api/graph", graphRoutes);
 
 serve({
   fetch: app.fetch,
