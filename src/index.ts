@@ -35,9 +35,21 @@ app.get("/health", async (c) => {
 
 app.route("/api/graph", graphRoutes);
 
-serve({
+const server = serve({
   fetch: app.fetch,
   port: env.PORT,
 });
 
 console.log(`GraphPilot API running on http://localhost:${env.PORT}`);
+
+const shutdown = (signal: string) => {
+  console.log(`${signal} received, shutting down...`);
+
+  server.close(async () => {
+    await neo4jDriver.close();
+    process.exit(0);
+  });
+};
+
+process.once("SIGTERM", () => shutdown("SIGTERM"));
+process.once("SIGINT", () => shutdown("SIGINT"));

@@ -1,6 +1,6 @@
 services:
   neo4j:
-    image: neo4j:5-community
+    image: neo4j:5.26-community # LTS
     container_name: graphpilot-neo4j
     restart: unless-stopped
 
@@ -9,12 +9,26 @@ services:
       - "7687:7687"
 
     environment:
-      NEO4J_AUTH: ${NEO4J_AUTH}
+      NEO4J_AUTH: ${NEO4J_USERNAME}/${NEO4J_PASSWORD}
+      NEO4J_USERNAME: ${NEO4J_USERNAME}
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD}
+      NEO4J_PLUGINS: '["apoc"]'
+      NEO4J_server_memory_heap_max__size: 1G
+      NEO4J_server_memory_pagecache_size: 512M
+
+    healthcheck:
+      test: ["CMD-SHELL", "cypher-shell -u $${NEO4J_USERNAME} -p $${NEO4J_PASSWORD} 'RETURN 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
     volumes:
       - neo4j_data:/data
       - neo4j_logs:/logs
+      - neo4j_plugins:/plugins
 
 volumes:
   neo4j_data:
   neo4j_logs:
+  neo4j_plugins:

@@ -6,5 +6,10 @@ export const neo4jDriver = neo4j.driver(
   neo4j.auth.basic(
     env.NEO4J_USERNAME,
     env.NEO4J_PASSWORD
-  )
+  ),
+  {
+    disableLosslessIntegers: true,
+    maxConnectionPoolSize: 50,
+    connectionAcquisitionTimeout: 30_000,
+  }
 );
